@@ -128,7 +128,7 @@ assert(X32.dtype == np.float32)
 n_samples = X32.shape[0]
 out = np.zeros((n_samples, ), dtype=np.intp)
 
-#eval_tree(tree, X32)
+eval_tree(tree, X32)
 
 #for i in range(n_samples):
 #    node = self.nodes
