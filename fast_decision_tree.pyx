@@ -46,7 +46,6 @@ NODE_DTYPE = np.dtype({
     ]
 })
     
-    
 cdef class Tree:
     # The Tree object is a binary tree structure constructed by the
     # TreeBuilder. The tree structure is used for predictions and
@@ -95,9 +94,14 @@ cpdef np.ndarray eval_tree(object o, object X):
     cdef Node* nodes = t.nodes
     cdef Node* node = NULL
     cdef SIZE_t i = 0
+    
+    print("beginning eval...")
 
     for i in range(n_samples):
+        print("i = {}".format(i))
         node = nodes
+        print("Address of node: {0:x}".format(<unsigned int>&node))
+        print("node.left_child == {}".format(node.left_child))
         # While node not a leaf
         while node.left_child != _TREE_LEAF:
             # ... and node.right_child != _TREE_LEAF:
@@ -111,31 +115,24 @@ cpdef np.ndarray eval_tree(object o, object X):
     return out
 
 
-#def eval_tree(object o, object X):
-#    cdef Tree t = <Tree>o;
-#    print("eval_tree({})".format(str(t)))
-#    print("o's address: {}".format(str(o)))
-#    print("t's address: {}".format(str(t)))
-#    print("nodes: {}".format(<unsigned int>&t.nodes))
-#    print("node count: {}".format(t.node_count))
+#cpdef apply(self, np.ndarray[DTYPE_t, ndim=2] X):
+#    """Finds the terminal region (=leaf node) for each sample in X."""
+#    cdef int i = 0
+#    cdef int n_samples = X.shape[0]
+#    cdef int node_id = 0
 #
-#    # Extract input
-#    cdef np.ndarray X_ndarray = X
-#    cdef DTYPE_t* X_ptr = <DTYPE_t*> X_ndarray.data
-#    cdef SIZE_t X_sample_stride = <SIZE_t> X.strides[0] / <SIZE_t> X.itemsize
-#    cdef SIZE_t X_fx_stride = <SIZE_t> X.strides[1] / <SIZE_t> X.itemsize
-#    cdef SIZE_t n_samples = X.shape[0]
+#    cdef np.ndarray[np.int32_t, ndim=1] out
+#    out = np_zeros((n_samples, ), dtype=np.int32)
 #
-#    cdef Node* nodes = t.nodes
-#    cdef Node* node = NULL
-#    node = nodes
-#    
-#    # While node not a leaf
-#    while node.left_child != _TREE_LEAF:
-#        # ... and node.right_child != _TREE_LEAF:
-#        if X_ptr[X_sample_stride * i +
-#                 X_fx_stride * node.feature] <= node.threshold:
-#            node = &nodes[node.left_child]
-#        else:
-#            node = &nodes[node.right_child]
-
+#    for i from 0 <= i < n_samples:
+#        node_id = 0
+#
+#        # While node_id not a leaf
+#        while self.children_left[node_id] != _TREE_LEAF: # and self.children_right[node_id] != _TREE_LEAF:
+#            if X[i, self.feature[node_id]] <= self.threshold[node_id]:
+#                node_id = self.children_left[node_id]
+#            else:
+#                node_id = self.children_right[node_id]
+#
+#        out[i] = node_id
+#    return out

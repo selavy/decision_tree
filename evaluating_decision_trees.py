@@ -11,19 +11,9 @@ import numpy as np
 import pandas as pd
 import patsy.highlevel
 from scipy.sparse import issparse
-#import pyximport; pyximport.install()
-#import fast_decision_trees as fdt
-
-#import fast_decision_tree as fdt
-#
-#fdt.eval_tree()
-
-
 import pyximport
-pyximport.install(setup_args={'include_dirs': np.get_include()},)
+pyximport.install(setup_args={'include_dirs': np.get_include()}, inplace=True, build_dir='.')
 from fast_decision_tree import eval_tree
-
-#eval_tree()
 
 N = 42
 xs = np.random.lognormal(mean=5.0, sigma=2.0, size=N)
