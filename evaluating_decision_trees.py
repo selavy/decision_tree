@@ -11,9 +11,9 @@ import numpy as np
 import pandas as pd
 import patsy.highlevel
 from scipy.sparse import issparse
-#import pyximport
-#pyximport.install(setup_args={'include_dirs': np.get_include()}, inplace=True, build_dir='.')
-#from fast_decision_tree import eval_tree
+import pyximport
+pyximport.install(setup_args={'include_dirs': np.get_include()}, inplace=True, build_dir='.')
+from fast_decision_tree import eval_tree
 
 N = 42
 xs = np.random.lognormal(mean=5.0, sigma=2.0, size=N)
@@ -110,7 +110,7 @@ out = np.zeros((n_samples, ), dtype=np.intp)
 #            node_id = tree.children_right[node_id]
 #    out[i] = node_id
 
-def eval_tree(tree, xs):
+def eval_tree2(tree, xs):
     node_id = 0
     while tree.children_left[node_id] >= 0:
         if xs[tree.feature[node_id]] <= tree.threshold[node_id]:
@@ -120,10 +120,12 @@ def eval_tree(tree, xs):
     return node_id
     
 for i in range(n_samples):
-    out[i] = eval_tree(tree, X32[i, :])
+    out[i] = eval_tree(tree, X[i, :])
 
 proba3 = tree.value.take(out, axis=0) #, mode='clip')
 proba4 = proba3[:, 0]
 y_pred6 = np.argmax(proba4, axis=1)
 result6 = np.allclose(y_pred, y_pred6)
 print("y_pred =?= y_pred6: {}".format(result6))
+
+# %%
