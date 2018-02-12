@@ -1,3 +1,7 @@
+# encoding: utf-8
+# cython: profile=True
+# filename: fast_decision_tree.pyx
+
 cimport cython
 cimport numpy as np
 import numpy as np
