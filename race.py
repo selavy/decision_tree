@@ -13,7 +13,7 @@ import pandas as pd
 import patsy.highlevel
 import pyximport
 pyximport.install(setup_args={'include_dirs': np.get_include()}, inplace=True, build_dir='.')
-from fast_decision_tree import eval_tree
+from fast_decision_tree import eval_forest
 
 # %%
 
@@ -40,7 +40,7 @@ y = y.flatten()
 
 from sklearn.ensemble import RandomForestClassifier
 
-clf = RandomForestClassifier(n_estimators=1,
+clf = RandomForestClassifier(n_estimators=2,
                              criterion="gini",
                              max_depth=5,
                              min_samples_leaf=2,
@@ -51,6 +51,31 @@ clf = RandomForestClassifier(n_estimators=1,
 
 clf.fit(X, y)
 y_pred = clf.predict(X)
+y_proba = clf.predict_proba(X)
+
+# %%
+
+# random forest is mean of probas
+proba0 = clf.estimators_[0].predict_proba(X)
+proba1 = clf.estimators_[1].predict_proba(X)
+proba = proba0 + proba1
+result = proba / 2.
+print(np.allclose(result, y_proba))
+
+# %%
+
+X32 = X.astype(np.float32)
+p0 = clf.estimators_[0].tree_.predict(X32)
+normalizer = np.sum(p0, axis=1)[:, np.newaxis]
+normalizer[normalizer == 0.0] = 1.0
+proba0 = p0 / normalizer
+p1 = clf.estimators_[1].tree_.predict(X32)
+normalizer = np.sum(p1, axis=1)[:, np.newaxis]
+normalizer[normalizer == 0.0] = 1.0
+proba1 = p1 / normalizer
+proba = proba0 + proba1
+result = proba / 2.
+print(np.allclose(result, y_proba))
 
 # %% ---- vectorized version
 
@@ -102,12 +127,21 @@ print("Result #2: {}".format(result))
 
 start = time.time()
 y_pred2 = np.zeros(len(X), dtype=np.double)
-tree = clf.estimators_[0].tree_
 for i in range(len(X)):
-    y_pred2[i] = eval_tree(tree, X[i, :])
+    y_pred2[i] = eval_forest(clf, X[i, :])
 end = time.time()
 print("Took {:0.2f} seconds.".format(end - start))
 result = np.allclose(y_pred, y_pred2)
 print("Result #2: {}".format(result))
+            
+#start = time.time()
+#y_pred2 = np.zeros(len(X), dtype=np.double)
+#tree = clf.estimators_[0].tree_
+#for i in range(len(X)):
+#    y_pred2[i] = eval_tree(tree, X[i, :])
+#end = time.time()
+#print("Took {:0.2f} seconds.".format(end - start))
+#result = np.allclose(y_pred, y_pred2)
+#print("Result #2: {}".format(result))
 
 # %%
