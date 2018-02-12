@@ -116,6 +116,66 @@ cdef class Tree:
         return 0
 
 
+cpdef eval_tree(object o, np.ndarray[DTYPE_t, ndim=2] X):
+    """Finds the terminal region (=leaf node) for each sample in X."""
+    cdef Tree t = <Tree>o;
+    
+    print("n_features: {}".format(t.n_features))
+    print("n_classes: {}".format(<unsigned int>&t.n_classes))
+    print("n_outputs: {}".format(t.n_outputs))
+    print("max_n_classes: {}".format(t.max_n_classes))
+    print("value_stride: {}".format(t.value_stride))
+#    print("criterion: {}".format(<unsigned int>&t.criterion))
+    print("max_depth: {}".format(t.max_depth))
+    print("min_samples_split: {}".format(t.min_samples_split))
+    print("min_samples_leaf: {}".format(t.min_samples_leaf))
+    print("min_density: {}".format(t.min_density))
+    print("max_features: {}".format(t.max_features))
+    print("find_split_algorithm: {}".format(t.find_split_algorithm))
+#    print("random_state: {}".format(t.random_state))  # blows up
+    print("node_count: {}".format(t.node_count))
+    print("capacity: {}".format(t.capacity))
+    print("children_left: {}".format(<unsigned int>&t.children_left))
+    print("children_right: {}".format(<unsigned int>&t.children_right))
+    print("feature: {}".format(<unsigned int>&t.feature))
+    print("threshold: {}".format(<unsigned int>&t.threshold))
+    print("value: {}".format(<unsigned int>&t.value))
+    print("best_error: {}".format(<unsigned int>&t.best_error))
+    print("init_error: {}".format(<unsigned int>&t.init_error))
+    print("n_samples: {}".format(<unsigned int>&t.n_samples))
+    
+    
+#    cdef int i = 0
+#    cdef int n_samples = X.shape[0]
+#    cdef int node_id = 0
+#    cdef int* feature = t.feature
+#    cdef int* children_left = t.children_left
+#    cdef int* children_right = t.children_right  
+#    cdef double* threshold = t.threshold
+#
+#    cdef np.ndarray[np.int32_t, ndim=1] out
+#    out = np.zeros((n_samples, ), dtype=np.int32)
+#    
+#    print("n_features = {}".format(t.n_features))
+#
+#    print("Beginning...")
+#    for i from 0 <= i < n_samples:
+#        print("i = {}".format(i))
+#        print("children_left = {:x}".format(<unsigned int>&children_left))
+#        node_id = 0
+#
+#        # While node_id not a leaf
+#        while children_left[node_id] != _TREE_LEAF: # and children_right[node_id] != _TREE_LEAF:
+#            print("\t...while loop...")
+#            if X[i, feature[node_id]] <= threshold[node_id]:
+#                node_id = children_left[node_id]
+#            else:
+#                node_id = children_right[node_id]
+#
+#        out[i] = node_id
+#    return out
+#
+
 #cpdef np.ndarray eval_tree(object o, object X):
 #    """Finds the terminal region (=leaf node) for each sample in X."""
 #    cdef Tree t = <Tree>o;
@@ -163,36 +223,3 @@ cdef class Tree:
 #        out_ptr[i] = <SIZE_t>(node - nodes)  # node offset
 #    return out
 
-
-cpdef eval_tree(object o, np.ndarray[DTYPE_t, ndim=2] X):
-    """Finds the terminal region (=leaf node) for each sample in X."""
-    cdef Tree t = <Tree>o;
-    
-    cdef int i = 0
-    cdef int n_samples = X.shape[0]
-    cdef int node_id = 0
-    cdef int* feature = t.feature
-    cdef int* children_left = t.children_left
-    cdef int* children_right = t.children_right  
-    cdef double* threshold = t.threshold
-
-    cdef np.ndarray[np.int32_t, ndim=1] out
-    out = np.zeros((n_samples, ), dtype=np.int32)
-    
-    print("n_features = {}".format(t.n_features))
-
-#    print("Beginning...")
-#    for i from 0 <= i < n_samples:
-#        print("i = {}".format(i))
-#        print("children_left = {:x}".format(<unsigned int>&node))
-#        node_id = 0
-#
-#        # While node_id not a leaf
-#        while children_left[node_id] != _TREE_LEAF: # and children_right[node_id] != _TREE_LEAF:
-#            if X[i, feature[node_id]] <= threshold[node_id]:
-#                node_id = children_left[node_id]
-#            else:
-#                node_id = children_right[node_id]
-#
-#        out[i] = node_id
-#    return out
