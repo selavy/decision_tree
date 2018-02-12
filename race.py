@@ -17,7 +17,7 @@ from fast_decision_tree import eval_tree
 
 # %%
 
-N = 500
+N = 5000
 xs = np.random.lognormal(mean=5.0, sigma=2.0, size=N)
 ys = np.random.lognormal(mean=7.0, sigma=9.0, size=N)
 zs = np.random.lognormal(mean=0.0, sigma=1.0, size=N)
@@ -86,6 +86,28 @@ print("Took {:0.2f} seconds.".format(end - start))
 result = np.allclose(y_pred, y_pred2)
 print("Result #2: {}".format(result))
       
-# %% ---- 
-      
-      
+# %% ---- non-vectorized version #3: convert to float32 ahead of time
+
+start = time.time()
+X32 = X.astype(np.float32)
+y_pred2 = np.zeros(len(X32), dtype=np.double)
+for i in range(len(X32)):
+    y_pred2[i] = clf.predict(X32[i, :].reshape(1, -1))
+end = time.time()
+print("Took {:0.2f} seconds.".format(end - start))
+result = np.allclose(y_pred, y_pred2)
+print("Result #2: {}".format(result))
+    
+# %% ---- using cython version
+
+start = time.time()
+y_pred2 = np.zeros(len(X), dtype=np.double)
+tree = clf.estimators_[0].tree_
+for i in range(len(X)):
+    y_pred2[i] = eval_tree(tree, X[i, :])
+end = time.time()
+print("Took {:0.2f} seconds.".format(end - start))
+result = np.allclose(y_pred, y_pred2)
+print("Result #2: {}".format(result))
+
+# %%

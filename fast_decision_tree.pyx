@@ -5,7 +5,7 @@ import numpy as np
 @cython.boundscheck(False)
 @cython.wraparound(False)
 @cython.nonecheck(False)
-def eval_tree(object tree, np.ndarray[double, ndim=1, mode="c"] xs):
+cdef int apply_tree(object tree, np.ndarray[double, ndim=1, mode="c"] xs):
     cdef np.ndarray[np.int64_t] children_left = tree.children_left
     cdef np.ndarray[np.int64_t] children_right = tree.children_right
     cdef np.ndarray[np.int64_t] feature = tree.feature
@@ -18,3 +18,8 @@ def eval_tree(object tree, np.ndarray[double, ndim=1, mode="c"] xs):
             node_id = children_right[node_id]
     return node_id
     
+def eval_tree(object tree, np.ndarray[double, ndim=1, mode="c"] xs):
+    cdef int node_id = apply_tree(tree, xs)
+    cdef double left = tree.value[node_id][0][0]
+    cdef double right = tree.value[node_id][0][1]
+    return 1 if right > left else 0
